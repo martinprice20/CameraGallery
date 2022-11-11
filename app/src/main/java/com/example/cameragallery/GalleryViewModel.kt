@@ -31,7 +31,7 @@ class GalleryViewModel(application: Application) : AndroidViewModel(application)
     fun loadPhotos() = viewModelScope.launch(Dispatchers.IO) {
         val projection = arrayOf(MediaStore.Images.Media._ID)
         val selection = MediaStore.Images.Media.DATE_ADDED
-        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED}DESC"
+        val sortOrder = "${MediaStore.Images.Media.DATE_ADDED} DESC"
 
         appContext.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

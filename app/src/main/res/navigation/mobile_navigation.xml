@@ -14,7 +14,7 @@
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.cameragallery.ui.gallery.GalleryFragment"
-        android:label="@string/title_home"
+        android:label="@string/gallery"
         tools:layout="@layout/fragment_gallery">
         <action
             android:id="@+id/actionPhotoFilter"
@@ -24,7 +24,7 @@
     <fragment
         android:id="@+id/nav_photo_filter"
         android:name="com.example.cameragallery.ui.PhotoFilterFragment"
-        android:label="@string/title_dashboard"
+        android:label="@string/add_filter"
         tools:layout="@layout/fragment_photo_filter">
         <argument
             android:name="photo"

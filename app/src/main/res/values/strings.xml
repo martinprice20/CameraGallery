@@ -20,4 +20,5 @@
     <string name="permission_required">The app requires camera and storage permissions to run.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_filter">Add Photo Filter</string>
 </resources>

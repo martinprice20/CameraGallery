@@ -12,12 +12,13 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.cameragallery.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,14 +35,9 @@ class MainActivity : AppCompatActivity() {
 
         val navView: BottomNavigationView = binding.navView
 
-        val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-        val appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications
-            )
-        )
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        val appBarConfiguration = AppBarConfiguration(setOf(R.id.nav_camera, R.id.nav_gallery))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
@@ -105,12 +101,14 @@ class MainActivity : AppCompatActivity() {
         val resolver = applicationContext.contentResolver
         val imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, prepareContentValues())
         try {
-            val fos = imageUri?.let(resolver::openOutputStream)
+            val fos = imageUri?.let { resolver.openOutputStream(it) }
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
             fos?.close()
             Toast.makeText(this, resources.getString(R.string.photo_saved), Toast.LENGTH_LONG).show()
+        } catch (e: FileNotFoundException) {
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
         } catch (e: IOException) {
-            Toast.makeText(this,resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
+            Toast.makeText(this, resources.getString(R.string.error_saving_photo), Toast.LENGTH_LONG).show()
         }
     }
 }

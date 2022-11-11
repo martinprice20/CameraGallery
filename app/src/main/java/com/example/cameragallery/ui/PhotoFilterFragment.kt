@@ -105,12 +105,22 @@ class PhotoFilterFragment : Fragment() {
         return bitmap
     }
 
-    private fun loadImage(glideFilter: Transformation<Bitmap>?) {
+    private fun loadImage(glideFilter: Transformation<Bitmap>?){
         when {
             photo != null && glideFilter != null -> {
                 Glide.with(this)
                     .load(photo!!.uri)
-                    .transform(CenterCrop(), glideFilter)
+                    .transform(
+                        CenterCrop(),
+                        glideFilter
+                    )
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(binding.selectedImage)
+            }
+            photo != null -> {
+                Glide.with(this)
+                    .load(photo!!.uri)
+                    .centerCrop()
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.selectedImage)
             }
