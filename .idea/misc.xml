@@ -8,6 +8,7 @@
         <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_photo_filter.xml" value="0.31875" />
         <entry key="app/src/main/res/layout/image_preview.xml" value="0.3328125" />
+        <entry key="app/src/main/res/menu/main.xml" value="0.16666666666666666" />
         <entry key="app/src/main/res/menu/popup.xml" value="0.3328125" />
       </map>
     </option>

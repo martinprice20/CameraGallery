@@ -72,8 +72,8 @@ class GalleryFragment : Fragment() {
 
     private fun deletePhoto() {
         try {
-            val photo = viewModel.photoToDelete?: return val rowsDeleted
-            = requireActivity().applicationContext.contentResolver.delete(photo.uri, null)
+            val photo = viewModel.photoToDelete?: return
+            val rowsDeleted = requireActivity().applicationContext.contentResolver.delete(photo.uri, null)
             if (rowsDeleted == 1) viewModel.photoToDelete = null
         } catch (recoverableSecurityException: RecoverableSecurityException) {
             val intentSender = recoverableSecurityException.userAction.actionIntent.intentSender

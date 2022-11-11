@@ -1,42 +1,48 @@
 package com.example.cameragallery.ui
 
-import com.example.cameragallery.Photo
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.PointF
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.example.cameragallery.MainActivity
+import com.example.cameragallery.Photo
 import com.example.cameragallery.R
 import com.example.cameragallery.databinding.FragmentPhotoFilterBinding
+import jp.wasabeef.glide.transformations.GrayscaleTransformation
+import jp.wasabeef.glide.transformations.gpu.*
 
 
 class PhotoFilterFragment : Fragment() {
     private var _binding : FragmentPhotoFilterBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private var photo: Photo? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return super.onCreateView(inflater, container, savedInstanceState)
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+    ): View {
         arguments?.let {
             val safeArgs = PhotoFilterFragmentArgs.fromBundle(it)
             photo = safeArgs.photo
         }
-        setHasOptionsMenu(true)
-        loadImage(null)
+        _binding = FragmentPhotoFilterBinding.inflate(inflater, container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
+        loadImage(null)
         ArrayAdapter.createFromResource(
             requireActivity(),
             R.array.filters_array,
@@ -46,6 +52,57 @@ class PhotoFilterFragment : Fragment() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.filterSpinner.adapter = adapter
         }
+
+        binding.filterSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val filter = parent?.getItemAtPosition(position).toString()
+                applyFilter(filter)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun applyFilter(filter: String?) {
+        when(filter) {
+            "None" -> loadImage(null)
+            "Greyscale" -> loadImage(GrayscaleTransformation())
+            "Swirl" -> loadImage(SwirlFilterTransformation(0.5f, 1.0f, PointF(0.5f, 0.5f)))
+            "Invert filter" -> loadImage(InvertFilterTransformation())
+            "Kuwahara filter" -> loadImage(KuwaharaFilterTransformation(25))
+            "Sketch filter" -> loadImage(SketchFilterTransformation())
+            "Toon filter" -> loadImage(ToonFilterTransformation())
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main, menu)
+        menu.findItem(R.id.save).isVisible = true
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> findNavController().popBackStack()
+            R.id.save -> {
+                val image = getBitmapFromView(binding.selectedImage)
+                if (image != null) (activity as MainActivity).saveImage(image)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun getBitmapFromView(view: View): Bitmap? {
+        val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        view.draw(canvas)
+        return bitmap
     }
 
     private fun loadImage(glideFilter: Transformation<Bitmap>?) {
@@ -55,7 +112,7 @@ class PhotoFilterFragment : Fragment() {
                     .load(photo!!.uri)
                     .transform(CenterCrop(), glideFilter)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .into(binding!!.selectedImage)
+                    .into(binding.selectedImage)
             }
         }
     }
